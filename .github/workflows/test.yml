@@ -1,0 +1,45 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        unityVersion:
+          - 2020.1.6f1
+        testMode:
+          - editmode
+    steps:
+      - name: Checkout repository with LFS support
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+      - name: Get short SHA
+        id: slug
+        run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
+      - name: Enable cache
+        uses: actions/cache@v1.1.0
+        with:
+          path: Library
+          key: Library-${{ matrix.targetPlatform }}
+      - uses: webbertakken/unity-test-runner@v1.4
+          id: tests
+          with:
+            unityVersion: ${{ matrix.unityVersion }}
+            testMode: ${{ matrix.testMode }}
+            artifactsPath: ${{ matrix.testMode }}-artifacts
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: Test-${{ matrix.targetPlatform }}-${{ steps.slug.outputs.sha8 }}
+          path: ${{ steps.tests.outputs.artifactsPath }}
