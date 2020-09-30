@@ -33,11 +33,11 @@ jobs:
           path: Library
           key: Library-${{ matrix.targetPlatform }}
       - uses: webbertakken/unity-test-runner@v1.4
-          id: tests
-          with:
-            unityVersion: ${{ matrix.unityVersion }}
-            testMode: ${{ matrix.testMode }}
-            artifactsPath: ${{ matrix.testMode }}-artifacts
+        id: tests
+        with:
+          unityVersion: ${{ matrix.unityVersion }}
+          testMode: ${{ matrix.testMode }}
+          artifactsPath: ${{ matrix.testMode }}-artifacts
       - name: Upload build artifact
         uses: actions/upload-artifact@v1
         with:
